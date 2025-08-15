@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Extract data from pikachu.json using jq, format with awk and sed
+jq -r '.name as $name | .height as $height | .weight as $weight | .types[0].type.name as $type | "\($name) \($type) \($weight) \($height)"' pikachu.json | \
+awk '{print $1 " is of type " $2 ", weighs " $3 "kg, and is " $4/10 "m tall."}' | \
+sed 's/^./\U&/'
