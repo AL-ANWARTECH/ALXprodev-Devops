@@ -1,6 +1,13 @@
 #!/bin/bash
+# Extract Pokemon data
+name=$(jq -r '.name' pikachu.json)
+height=$(jq -r '.height' pikachu.json)
+weight=$(jq -r '.weight' pikachu.json)
+type=$(jq -r '.types[0].type.name' pikachu.json)
 
-# Extract Pokemon data and format output
-jq -r '.name as $name | .height as $height | .weight as $weight | .types[0].type.name as $type | "\($name) \($type) \($weight) \($height)"' pikachu.json | \
-awk '{print $1 " is of type " $2 ", weighs " $3 "kg, and is " $4/10 "m tall."}' | \
-sed 's/^[a-z]/\U&/'
+# Format height and weight
+formatted_height=$(echo "scale=1; $height/10" | bc)
+formatted_weight=$weight
+
+# Output in required format
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
