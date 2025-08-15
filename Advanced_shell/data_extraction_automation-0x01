@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# Extract Pokemon data and format output
-jq -r ".name + \" \" + (.weight|tostring) + \" \" + (.height|tostring) + \" \" + .types[0].type.name" pikachu.json | \
-awk '{print $1 " is of type " $4 ", weighs " $2 "kg, and is " $3/10 "m tall."}' | \
-sed 's/./\U&/'
