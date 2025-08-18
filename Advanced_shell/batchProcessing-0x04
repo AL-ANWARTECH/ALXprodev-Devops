@@ -12,6 +12,9 @@ error_log="pokemon_data/error.log"
 
 echo "Fetching Pokémon data in parallel..."
 
+# Trap CTRL+C (SIGINT) to clean up background jobs
+trap 'echo "Stopping... killing background jobs"; kill 0; exit 1' SIGINT
+
 for pokemon in "${pokemon_list[@]}"; do
     (
         echo "Fetching data for $pokemon..."
