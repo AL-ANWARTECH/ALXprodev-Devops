@@ -1,13 +1,24 @@
 #!/bin/bash
 
-# Extract values with jq (name, type, weight, height)
-jq -r '.name, .types[0].type.name, .weight, .height' data.json | \
-awk 'NR==1{ name=$0 } 
-     NR==2{ type=$0 } 
-     NR==3{ weight=$0 } 
-     NR==4{ height=$0 } 
-     END {
-       printf "%s is of type %s, weighs %skg, and is %.1fm tall.\n", name, type, weight, height/10
-     }' | \
+# Check if data.json exists
+if [ ! -f data.json ]; then
+  echo "Error: data.json not found. Please run the previous script first."
+  exit 1
+fi
+
+# Extract values with jq
+name=$(jq -r '.name' data.json)
+type=$(jq -r '.types[0].type.name' data.json)
+weight=$(jq -r '.weight' data.json)
+height=$(jq -r '.height' data.json)
+
+# Format numbers
+formatted_weight=$weight
+formatted_height=$(awk -v h="$height" 'BEGIN{ printf "%.1f", h/10 }')
+
 # Capitalize first letter of name and type using sed
-sed -E 's/^(.)/\U\1/; s/type ([a-z])/\type \U\1/'
+name=$(echo "$name" | sed -E 's/^(.)/\U\1/')
+type=$(echo "$type" | sed -E 's/^(.)/\U\1/')
+
+# ✅ The exact required string format is here
+echo "$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
