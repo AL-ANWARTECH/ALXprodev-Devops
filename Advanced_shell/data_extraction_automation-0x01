@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Extract fields from JSON using jq
+jq -r '.name as $name |
+       .height as $height |
+       .weight as $weight |
+       .types[0].type.name as $type |
+       "\($name) \($type) \($weight) \($height)"' data.json | \
+# Format the output nicely with awk and sed
+awk '{print toupper(substr($1,1,1)) substr($1,2) " is of type " toupper(substr($2,1,1)) substr($2,2) ", weighs " $3 "kg, and is " $4/10 "m tall."}'
