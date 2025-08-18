@@ -1,17 +1,13 @@
 #!/bin/bash
 
-# Extract values with jq
+# Extract values with jq (name, type, weight, height)
 jq -r '.name, .types[0].type.name, .weight, .height' data.json | \
 awk 'NR==1{ name=$0 } 
      NR==2{ type=$0 } 
      NR==3{ weight=$0 } 
      NR==4{ height=$0 } 
      END {
-       # capitalize name and type
-       name=toupper(substr(name,1,1)) substr(name,2)
-       type=toupper(substr(type,1,1)) substr(type,2)
-
-       # format numbers (weight is already kg, height is dm so /10 → m)
        printf "%s is of type %s, weighs %skg, and is %.1fm tall.\n", name, type, weight, height/10
-     }'
-
+     }' | \
+# Capitalize first letter of name and type using sed
+sed -E 's/^(.)/\U\1/; s/type ([a-z])/\type \U\1/'
