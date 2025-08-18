@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Create the pokemon_data directory if it doesn't exist
+mkdir -p pokemon_data
+
+# Array of Pokémon to fetch
+pokemon_list=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+
+# Log file for errors
+error_log="pokemon_data/error.log"
+> "$error_log"  # clear old errors
+
+echo "Fetching Pokémon data in parallel..."
+
+for pokemon in "${pokemon_list[@]}"; do
+    (
+        echo "Fetching data for $pokemon..."
+
+        # Fetch Pokémon data
+        curl -s "https://pokeapi.co/api/v2/pokemon/$pokemon" -o "pokemon_data/$pokemon.json"
+
+        # Validate JSON
+        if jq -e '.name' "pokemon_data/$pokemon.json" >/dev/null 2>&1; then
+            echo "Saved data to pokemon_data/$pokemon.json ✅"
+        else
+            echo "❌ Failed to fetch data for $pokemon" | tee -a "$error_log"
+            rm -f "pokemon_data/$pokemon.json"
+        fi
+    ) &
+done
+
+# Wait for all background jobs to finish
+wait
+
+echo "All downloads complete."
+if [ -s "$error_log" ]; then
+    echo "Some errors were logged in $error_log"
+fi
